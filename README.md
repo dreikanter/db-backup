@@ -2,12 +2,12 @@
 
 Usage:
 
-![help](/dreikanter/frf-music-backup/screenshots/help.png)
+![help](screenshots/help.png)
 
 Sample run:
 
-![output](/dreikanter/frf-music-backup/screenshots/backup-output.png)
+![output](screenshots/backup-output.png)
 
 Result:
 
-![backup dir](/dreikanter/frf-music-backup/screenshots/backup-dir.png)
+![backup dir](screenshots/backup-dir.png)
