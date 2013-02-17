@@ -6,15 +6,9 @@
 import argparse
 from datetime import datetime
 import glob
+import logging
 import os.path
 import shutil
-
-
-def makedirs(dir_path):
-    if dir_path and not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-        return True
-    return False
 
 
 def parse_args():
@@ -22,11 +16,11 @@ def parse_args():
     parser.add_argument('source',
                         metavar='<source/path>',
                         type=str,
-                        help='source Shared Music dir location; env vars are allowed; example: "$userprofile/Desktop/Dropbox/Shared Music"')
+                        help='source Shared Music dir location; env vars are allowed')
     parser.add_argument('dest',
                         metavar='<backup/path>',
                         type=str,
-                        help='backup path; year/month-based dir structure could be used; example: "/backup/shared-music/%%Y-%%m"')
+                        help='backup path; year/month-based dir structure could be used')
     parser.add_argument('-d', '--dry',
                         action='store_true',
                         help='dry run')
@@ -34,15 +28,23 @@ def parse_args():
     return args.source, args.dest, args.dry
 
 
+log_file = os.path.join(os.path.dirname(__file__), 'smbackup.log')
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s %(levelname)s: %(message)s",
+                    datefmt="%Y/%m/%d %H:%M:%S",
+                    filename=log_file)
+log = logging.getLogger()
+
 source_path, backup_path, dryrun = parse_args()
 
 if not os.path.isdir(source_path):
-    exit('source path not exists or accessible')
+    log.error("source path not exists or not accessible: '%s'" % source_path)
+    exit()
 
-print('source path: ' + source_path)
-print('backup path: ' + backup_path)
+log.info('source path: ' + source_path)
+log.info('backup path: ' + backup_path)
 if dryrun:
-    print('dry run mode enabled')
+    log.info('dry run mode enabled')
 
 for file_name in glob.glob(os.path.join(source_path, '*')):
     if os.path.isdir(file_name):
@@ -52,10 +54,10 @@ for file_name in glob.glob(os.path.join(source_path, '*')):
         dest_path = os.path.join(date_path, album_name)
 
         if os.path.exists(dest_path):
-            print(" - skipping '%s'" % album_name)
+            log.info(" - skipping '%s'" % album_name)
             continue
 
-        print(" - copying '%s' to '%s'..." % (album_name, date_path))
+        log.info(" - copying '%s' to '%s'..." % (album_name, date_path))
 
         if dryrun:
             continue
@@ -63,6 +65,6 @@ for file_name in glob.glob(os.path.join(source_path, '*')):
         try:
             shutil.copytree(file_name, dest_path)
         except Exception as e:
-            print e
+            log.error(str(e))
 
-print 'done'
+log.info('done')
