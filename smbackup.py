@@ -29,11 +29,15 @@ def parse_args():
 
 
 log_file = os.path.join(os.path.dirname(__file__), 'smbackup.log')
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)s: %(message)s",
-                    datefmt="%Y/%m/%d %H:%M:%S",
-                    filename=log_file)
 log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s",
+                              "%Y/%m/%d %H:%M:%S")
+for ch in [logging.StreamHandler(), logging.FileHandler(log_file)]:
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    log.addHandler(ch)
+
 
 source_path, backup_path, dryrun = parse_args()
 
