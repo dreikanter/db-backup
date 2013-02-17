@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""Shared music backup tool"""
+"""Dropbox shared files backup tool"""
 
 import argparse
 from datetime import datetime
@@ -12,11 +12,11 @@ import shutil
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='shared music backup tool')
+    parser = argparse.ArgumentParser(description='dropbox shared files backup tool')
     parser.add_argument('source',
                         metavar='<source/path>',
                         type=str,
-                        help='source Shared Music dir location; env vars are allowed')
+                        help='source directory location')
     parser.add_argument('dest',
                         metavar='<backup/path>',
                         type=str,
@@ -28,7 +28,7 @@ def parse_args():
     return args.source, args.dest, args.dry
 
 
-log_file = os.path.join(os.path.dirname(__file__), 'smbackup.log')
+log_file = os.path.join(os.path.dirname(__file__), 'dbbackup.log')
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s",
@@ -52,16 +52,16 @@ if dryrun:
 
 for file_name in glob.glob(os.path.join(source_path, '*')):
     if os.path.isdir(file_name):
-        album_name = os.path.basename(file_name)
-        album_date = datetime.fromtimestamp(os.path.getctime(file_name))
-        date_path = album_date.strftime(backup_path)
-        dest_path = os.path.join(date_path, album_name)
+        subdir_name = os.path.basename(file_name)
+        subdir_date = datetime.fromtimestamp(os.path.getctime(file_name))
+        date_path = subdir_date.strftime(backup_path)
+        dest_path = os.path.join(date_path, subdir_name)
 
         if os.path.exists(dest_path):
-            log.info(" - skipping '%s'" % album_name)
+            log.info(" - skipping '%s'" % subdir_name)
             continue
 
-        log.info(" - copying '%s' to '%s'..." % (album_name, date_path))
+        log.info(" - copying '%s' to '%s'..." % (subdir_name, date_path))
 
         if dryrun:
             continue
