@@ -28,12 +28,11 @@ def parse_args():
     return args.source, args.dest, args.dry
 
 
-log_file = os.path.join(os.path.dirname(__file__), 'dbbackup.log')
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s",
                               "%Y/%m/%d %H:%M:%S")
-for ch in [logging.StreamHandler(), logging.FileHandler(log_file)]:
+for ch in [logging.StreamHandler()]:
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(formatter)
     log.addHandler(ch)
