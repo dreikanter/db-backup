@@ -24,28 +24,28 @@ def parse_args():
     parser.add_argument('-d', '--dry',
                         action='store_true',
                         help='dry run')
+    parser.add_argument('-l', '--log',
+                        help='log file name')
     args = parser.parse_args()
-    return args.source, args.dest, args.dry
+    return args.source, args.dest, args.dry, args.log
 
+
+source_path, backup_path, dryrun, log_file = parse_args()
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s",
-                              "%Y/%m/%d %H:%M:%S")
-for ch in [logging.StreamHandler()]:
+for ch in [logging.StreamHandler(), logging.FileHandler(log_file, encoding='utf8')]:
     ch.setLevel(logging.DEBUG)
-    ch.setFormatter(formatter)
+    ch.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s",
+                                      "%Y/%m/%d %H:%M:%S"))
     log.addHandler(ch)
-
-
-source_path, backup_path, dryrun = parse_args()
 
 if not os.path.isdir(source_path):
     log.error("source path not exists or not accessible: '%s'" % source_path)
     exit()
 
-log.info('source path: ' + source_path)
-log.info('backup path: ' + backup_path)
+log.info("source path: '%s'" % source_path)
+
 if dryrun:
     log.info('dry run mode enabled')
 
@@ -57,10 +57,10 @@ for file_name in glob.glob(os.path.join(source_path, '*')):
         dest_path = os.path.join(date_path, subdir_name)
 
         if os.path.exists(dest_path):
-            log.info(" - skipping '%s'" % subdir_name)
+            log.info("skipping '%s'" % subdir_name)
             continue
 
-        log.info(" - copying '%s' to '%s'..." % (subdir_name, date_path))
+        log.info("copying '%s' to '%s'" % (subdir_name, dest_path))
 
         if dryrun:
             continue
